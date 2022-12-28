@@ -1,10 +1,8 @@
 echo "[1] - Installing updates"
 apt update && apt upgrade -y
-
 echo "[2] - Setting up a proxy server"
 yes | apt install dante-server -y
-yes | apt install curl
-
+yes | apt install curl -y
 echo "[3] - Getting a network profile"
 ext_interface () {
     for interface in /sys/class/net/*
@@ -14,7 +12,6 @@ ext_interface () {
                 printf '%s' "${interface##*/}" && return 0
     done
 }
-
 echo "[4] - Adding a config server"
 echo "logoutput: stderr" > /etc/danted.conf
 for ((i = 7000; i <= 7010; i++))
@@ -37,13 +34,11 @@ echo "socks pass {" >> /etc/danted.conf
 echo "        from: 0.0.0.0/0 to: 0.0.0.0/0" >> /etc/danted.conf
 echo "        log: connect error" >> /etc/danted.conf
 echo "}" >> /etc/danted.conf
-
 echo "[6] - Create a user"
 read -p "Enter user name: " user
 read -p "Enter user password: " pass
 useradd -s /bin/false ${user}
 echo "$user:$pass" | chpasswd
-
 echo "[7] - Restarting the server service"
 systemctl restart danted
 systemctl enable danted
